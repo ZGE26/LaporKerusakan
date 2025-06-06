@@ -8,5 +8,6 @@
     <string name="email">Email</string>
     <string name="format_email">\@exp.com</string>
     <string name="belum_punya_akun">Belum punya akun?</string>
-    <string name="daftar">"Daftar"</string>
+    <string name="daftar">Daftar</string>
+    <string name="login_dengan_google">Login Dengan Google</string>
 </resources>
