@@ -58,8 +58,8 @@ fun LoginScreen() {
 
     if (showConfirDialog)
         DialogKonfirmasi(
-            title = "Konfirmasi Keluar",
-            message = "Apakah Anda yakin ingin keluar?",
+            title = stringResource(R.string.keluar),
+            message = stringResource(R.string.pesan_keluar),
             onConfirm = {
                 activity?.finish()
             },
@@ -97,11 +97,11 @@ fun LoginContent(modifier: Modifier) {
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
-            label = { Text("Email") },
+            label = { Text(stringResource(R.string.email)) },
             leadingIcon = {
                 Icon(
                     imageVector = Icons.Default.Email,
-                    contentDescription = "Email Icon"
+                    contentDescription = stringResource(R.string.email_icon)
                 )
             },
             modifier = Modifier.fillMaxWidth(),
@@ -112,7 +112,7 @@ fun LoginContent(modifier: Modifier) {
             ),
             trailingIcon = {
                 Text(
-                    text = "@exp.com",
+                    text = stringResource(R.string.format_email),
                     modifier = Modifier.padding(end = 8.dp),
                     style = MaterialTheme.typography.bodyMedium.copy(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -126,11 +126,11 @@ fun LoginContent(modifier: Modifier) {
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
-            label = { Text("Password") },
+            label = { Text(stringResource(R.string.password)) },
             leadingIcon = {
                 Icon(
                     imageVector = Icons.Default.Lock,
-                    contentDescription = "Password Icon"
+                    contentDescription = stringResource(R.string.password_icon)
                 )
             },
             visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
@@ -176,7 +176,7 @@ fun LoginContent(modifier: Modifier) {
             horizontalArrangement = Arrangement.Center
         ) {
             Text(
-                text = "Belum punya akun? ",
+                text = stringResource(R.string.belum_punya_akun),
                 style = MaterialTheme.typography.bodyMedium,
             )
             TextButton(
@@ -189,7 +189,7 @@ fun LoginContent(modifier: Modifier) {
                 }
             ) {
                 Text(
-                    text = "Daftar",
+                    text = stringResource(R.string.daftar),
                     style = MaterialTheme.typography.bodyMedium.copy(
                         color = MaterialTheme.colorScheme.primary
                     ),

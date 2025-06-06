@@ -1,3 +1,12 @@
 <resources>
     <string name="app_name">Lapor Kerusakan</string>
+    <string name="keluar">Konfirmasi Keluar</string>
+    <string name="pesan_keluar">Apakah Anda yakin ingin keluar?</string>
+    <string name="email_icon">Email Icon</string>
+    <string name="password">Password</string>
+    <string name="password_icon">Password Icon</string>
+    <string name="email">Email</string>
+    <string name="format_email">\@exp.com</string>
+    <string name="belum_punya_akun">Belum punya akun?</string>
+    <string name="daftar">"Daftar"</string>
 </resources>
