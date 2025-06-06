@@ -1,8 +1,10 @@
 package com.aryaersi0120.laporkerusakan.ui.screen
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -27,7 +29,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -48,9 +52,15 @@ fun LoginScreen() {
 fun LoginContent(modifier: Modifier) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var errorMassage by remember { mutableStateOf("") }
+
     var passwordVisible by remember { mutableStateOf(false) }
+    var showDialogError by remember { mutableStateOf(false) }
+
+    var context = LocalContext.current
+
     val visibilityOn = painterResource(R.drawable.visibility)
-    val visibilityOff = painterResource(R.drawable.visibility)
+    val visibilityOff = painterResource(R.drawable.visibility_off_24)
 
     Column(
         modifier = modifier
@@ -59,9 +69,8 @@ fun LoginContent(modifier: Modifier) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Nama Aplikasi
         Text(
-            text = "Lapor Kerusakan",
+            text = stringResource(R.string.app_name),
             style = MaterialTheme.typography.headlineMedium,
             modifier = Modifier.padding(bottom = 32.dp)
         )
@@ -77,16 +86,24 @@ fun LoginContent(modifier: Modifier) {
                 )
             },
             modifier = Modifier.fillMaxWidth(),
-            maxLines = 1,
+            singleLine = true,
             keyboardOptions = KeyboardOptions(
                 capitalization = KeyboardCapitalization.Words,
                 imeAction = ImeAction.Next
-            )
+            ),
+            trailingIcon = {
+                Text(
+                    text = "@exp.com",
+                    modifier = Modifier.padding(end = 8.dp),
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    ),
+                )
+            },
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Password Input
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
@@ -121,28 +138,51 @@ fun LoginContent(modifier: Modifier) {
 
         Button(
             onClick = {
-                Log.d("LoginScreen", "Email: $email, Password: $password")
+                if (email.isEmpty() || password.isEmpty()) {
+                    showDialogError = true
+                    errorMassage = "Email dan Password tidak boleh kosong"
+                } else {
+                    Log.d("LoginScreen", "Login clicked with Email: $email and Password: $password")
+                }
             },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Login")
         }
 
-        TextButton(
-            onClick = {
-                //Navigation to registration screen can be implemented here
-            }
+        Row(
+            modifier = Modifier
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
         ) {
             Text(
                 text = "Belum punya akun? ",
                 style = MaterialTheme.typography.bodyMedium,
             )
-            Text(
-                text = "Daftar",
-                style = MaterialTheme.typography.bodyMedium.copy(
-                    color = MaterialTheme.colorScheme.primary
-                ),
-                fontWeight = FontWeight.Bold
+            TextButton(
+                onClick = {
+                    Toast.makeText(
+                        context,
+                        "Fitur pendaftaran belum tersedia",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            ) {
+                Text(
+                    text = "Daftar",
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        color = MaterialTheme.colorScheme.primary
+                    ),
+                    fontWeight = FontWeight.Bold
+                )
+            }
+        }
+
+        if (showDialogError) {
+            ErrorDialog(
+                message = errorMassage,
+                onDismiss = { showDialogError = false }
             )
         }
     }
