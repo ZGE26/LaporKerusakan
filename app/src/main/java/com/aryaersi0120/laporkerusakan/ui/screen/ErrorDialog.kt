@@ -1,6 +1,5 @@
 package com.aryaersi0120.laporkerusakan.ui.screen
 
-import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Warning
@@ -12,6 +11,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.window.Dialog
+import com.aryaersi0120.laporkerusakan.ui.theme.LaporKerusakanTheme
 
 @Composable
 fun ErrorDialog(
@@ -56,11 +56,13 @@ fun ErrorDialog(
 }
 
 @Preview(showBackground = true)
-@Preview(uiMode = UI_MODE_NIGHT_YES, showBackground = true)
+@Preview(uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES, showBackground = true)
 @Composable
 fun ErrorDialogPreview() {
-    ErrorDialog(
-        message = "An unexpected error occurred.",
-        onDismiss = {}
-    )
+    LaporKerusakanTheme {
+        ErrorDialog(
+            message = "An unexpected error occurred.",
+            onDismiss = {}
+        )
+    }
 }

@@ -42,6 +42,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.aryaersi0120.laporkerusakan.R
+import com.aryaersi0120.laporkerusakan.ui.theme.LaporKerusakanTheme
 
 @Composable
 fun LoginScreen() {
@@ -211,5 +212,7 @@ fun LoginContent(modifier: Modifier) {
 @Preview(uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES, showBackground = true)
 @Composable
 fun LoginScreenPreview() {
-    LoginScreen()
+    LaporKerusakanTheme {
+        LoginScreen()
+    }
 }
