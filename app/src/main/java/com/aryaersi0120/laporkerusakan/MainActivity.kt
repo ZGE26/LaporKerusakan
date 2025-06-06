@@ -6,15 +6,14 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
-import com.aryaersi0120.laporkerusakan.ui.screen.LoginScreen
-import com.aryaersi0120.laporkerusakan.ui.screen.MainScreen
+import com.aryaersi0120.laporkerusakan.navigation.SetupNavGraph
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            LoginScreen()
+            SetupNavGraph()
         }
     }
 }
@@ -23,5 +22,5 @@ class MainActivity : ComponentActivity() {
 @Preview(uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES, showBackground = true)
 @Composable
 fun GreetingPreview() {
-    LoginScreen()
+    SetupNavGraph()
 }

@@ -1,6 +1,5 @@
 package com.aryaersi0120.laporkerusakan.ui.screen
 
-import android.app.Activity
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
@@ -49,29 +48,20 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.aryaersi0120.laporkerusakan.R
 import com.aryaersi0120.laporkerusakan.ui.theme.LaporKerusakanTheme
 
 @Composable
-fun RegisterScreen() {
-    var showExitConfirm by remember { mutableStateOf(false) }
-    val activity = LocalContext.current as? Activity
+fun RegisterScreen(navController: NavHostController) {
 
     Scaffold(modifier = Modifier.fillMaxSize()) { padding ->
         RegisterContent(modifier = Modifier.padding(padding))
     }
 
     BackHandler {
-        showExitConfirm = true
-    }
-
-    if (showExitConfirm) {
-        DialogKonfirmasi(
-            title = stringResource(R.string.keluar),
-            message = stringResource(R.string.pesan_keluar),
-            onConfirm = { activity?.finish() },
-            onDismiss = { showExitConfirm = false }
-        )
+        navController.popBackStack()
     }
 }
 
@@ -85,7 +75,7 @@ fun RegisterContent(modifier: Modifier) {
     var errorMessage by remember { mutableStateOf("") }
     var showDialogError by remember { mutableStateOf(false) }
 
-    var context = LocalContext.current
+    val context = LocalContext.current
 
     val visibilityOn = painterResource(R.drawable.visibility)
     val visibilityOff = painterResource(R.drawable.visibility_off_24)
@@ -277,6 +267,6 @@ fun RegisterContent(modifier: Modifier) {
 @Composable
 fun RegisterPreview() {
     LaporKerusakanTheme {
-        RegisterScreen()
+        RegisterScreen(rememberNavController())
     }
 }

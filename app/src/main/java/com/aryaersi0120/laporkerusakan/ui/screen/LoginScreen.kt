@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
@@ -50,16 +49,19 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.aryaersi0120.laporkerusakan.R
+import com.aryaersi0120.laporkerusakan.navigation.Screen
 import com.aryaersi0120.laporkerusakan.ui.theme.LaporKerusakanTheme
 
 @Composable
-fun LoginScreen() {
+fun LoginScreen(navController: NavHostController) {
     var showConfirDialog by remember { mutableStateOf(false) }
     val activity = LocalContext.current as? Activity
 
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-        LoginContent(modifier = Modifier.padding(innerPadding))
+        LoginContent(modifier = Modifier.padding(innerPadding), navController)
     }
 
     BackHandler {
@@ -78,7 +80,7 @@ fun LoginScreen() {
 }
 
 @Composable
-fun LoginContent(modifier: Modifier) {
+fun LoginContent(modifier: Modifier, navController: NavHostController) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var errorMassage by remember { mutableStateOf("") }
@@ -86,7 +88,7 @@ fun LoginContent(modifier: Modifier) {
     var passwordVisible by remember { mutableStateOf(false) }
     var showDialogError by remember { mutableStateOf(false) }
 
-    var context = LocalContext.current
+    val context = LocalContext.current
 
     val visibilityOn = painterResource(R.drawable.visibility)
     val visibilityOff = painterResource(R.drawable.visibility_off_24)
@@ -172,6 +174,7 @@ fun LoginContent(modifier: Modifier) {
                     errorMassage = "Email dan Password tidak boleh kosong"
                 } else {
                     Log.d("LoginScreen", "Login clicked with Email: $email and Password: $password")
+                    navController.navigate(Screen.MainScreen.route)
                 }
             },
             modifier = Modifier.fillMaxWidth()
@@ -195,11 +198,7 @@ fun LoginContent(modifier: Modifier) {
             )
             TextButton(
                 onClick = {
-                    Toast.makeText(
-                        context,
-                        "Fitur pendaftaran belum tersedia",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    navController.navigate(Screen.RegisterScreen.route)
                 }
             ) {
                 Text(
@@ -289,6 +288,6 @@ fun LoginContent(modifier: Modifier) {
 @Composable
 fun LoginScreenPreview() {
     LaporKerusakanTheme {
-        LoginScreen()
+        LoginScreen(rememberNavController())
     }
 }
