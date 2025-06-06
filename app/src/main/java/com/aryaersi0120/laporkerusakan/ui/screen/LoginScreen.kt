@@ -1,7 +1,9 @@
 package com.aryaersi0120.laporkerusakan.ui.screen
 
+import android.app.Activity
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -43,9 +45,26 @@ import com.aryaersi0120.laporkerusakan.R
 
 @Composable
 fun LoginScreen() {
+    var showConfirDialog by remember { mutableStateOf(false) }
+    val activity = LocalContext.current as? Activity
+
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
         LoginContent(modifier = Modifier.padding(innerPadding))
     }
+
+    BackHandler {
+        showConfirDialog = true
+    }
+
+    if (showConfirDialog)
+        DialogKonfirmasi(
+            title = "Konfirmasi Keluar",
+            message = "Apakah Anda yakin ingin keluar?",
+            onConfirm = {
+                activity?.finish()
+            },
+            onDismiss = { showConfirDialog = false }
+        )
 }
 
 @Composable
