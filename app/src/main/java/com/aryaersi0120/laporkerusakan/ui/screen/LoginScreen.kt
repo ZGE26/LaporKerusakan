@@ -45,10 +45,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.aryaersi0120.laporkerusakan.R
@@ -81,9 +83,13 @@ fun LoginScreen(navController: NavHostController) {
 
 @Composable
 fun LoginContent(modifier: Modifier, navController: NavHostController) {
+    val viewModel: MainViewModel = viewModel()
+
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var errorMassage by remember { mutableStateOf("") }
+
+    val isEmailValid = email.contains("@") && email.contains(".")
 
     var passwordVisible by remember { mutableStateOf(false) }
     var showDialogError by remember { mutableStateOf(false) }
@@ -119,9 +125,11 @@ fun LoginContent(modifier: Modifier, navController: NavHostController) {
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
             keyboardOptions = KeyboardOptions(
-                capitalization = KeyboardCapitalization.Words,
+                capitalization = KeyboardCapitalization.None,
+                keyboardType = KeyboardType.Email,
                 imeAction = ImeAction.Next
             ),
+            isError = !isEmailValid && email.isNotEmpty(),
             trailingIcon = {
                 Text(
                     text = stringResource(R.string.format_email),
@@ -174,7 +182,11 @@ fun LoginContent(modifier: Modifier, navController: NavHostController) {
                     errorMassage = "Email dan Password tidak boleh kosong"
                 } else {
                     Log.d("LoginScreen", "Login clicked with Email: $email and Password: $password")
-                    navController.navigate(Screen.MainScreen.route)
+//                    navController.navigate(Screen.MainScreen.route)
+                    viewModel.login(
+                        email = email,
+                        password = password,
+                    )
                 }
             },
             modifier = Modifier.fillMaxWidth()

@@ -53,6 +53,9 @@ dependencies {
     implementation(libs.androidx.animation.core.lint)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.retrofit)
+    implementation(libs.converter.scalars)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
