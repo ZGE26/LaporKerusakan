@@ -1,8 +1,7 @@
 package com.aryaersi0120.laporkerusakan.model
 
-data class LoginRequest(
+data class User(
+    val name: String,
     val email: String,
-    val password: String,
-    val user: User?
+    val token: String
 )
-

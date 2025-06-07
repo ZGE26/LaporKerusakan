@@ -183,7 +183,7 @@ fun LoginContent(modifier: Modifier, navController: NavHostController) {
                 } else {
                     Log.d("LoginScreen", "Login clicked with Email: $email and Password: $password")
 //                    navController.navigate(Screen.MainScreen.route)
-                    viewModel.login(
+                    viewModel.loginDummy(
                         email = email,
                         password = password,
                     )
