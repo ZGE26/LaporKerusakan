@@ -5,21 +5,27 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.aryaersi0120.laporkerusakan.ui.screen.LoadingScreen
 import com.aryaersi0120.laporkerusakan.ui.screen.LoginScreen
 import com.aryaersi0120.laporkerusakan.ui.screen.MainScreen
 import com.aryaersi0120.laporkerusakan.ui.screen.RegisterScreen
 
 @Composable
 fun SetupNavGraph(navController: NavHostController = rememberNavController()) {
+
     NavHost(
-        navController = navController,
-        startDestination = Screen.LoginScreen.route,
+        navController,
+        startDestination = Screen.LoadingScreen.route
     ) {
+        composable(route = Screen.LoadingScreen.route) {
+            LoadingScreen(navController)
+        }
+
         composable(route = Screen.LoginScreen.route) {
             LoginScreen(navController)
         }
         composable(route = Screen.MainScreen.route) {
-            MainScreen()
+            MainScreen(navController)
         }
         composable(route = Screen.RegisterScreen.route) {
             RegisterScreen(navController)

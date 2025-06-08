@@ -32,6 +32,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -98,6 +99,16 @@ fun LoginContent(modifier: Modifier, navController: NavHostController) {
 
     val visibilityOn = painterResource(R.drawable.visibility)
     val visibilityOff = painterResource(R.drawable.visibility_off_24)
+
+    if (viewModel.loginSuccess) {
+        LaunchedEffect(Unit) {
+            navController.navigate(Screen.MainScreen.route) {
+                popUpTo(Screen.LoginScreen.route) {
+                    inclusive = true
+                }
+            }
+        }
+    }
 
     Column(
         modifier = modifier
@@ -186,6 +197,7 @@ fun LoginContent(modifier: Modifier, navController: NavHostController) {
                     viewModel.loginDummy(
                         email = email,
                         password = password,
+                        context = context
                     )
                 }
             },
