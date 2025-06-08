@@ -32,9 +32,6 @@ class MainViewModel: ViewModel() {
     var loginSuccess by mutableStateOf(false)
         private set
 
-    var logoutSuccess by mutableStateOf(false)
-        private set
-
     fun loginDummy(email: String, password: String, context: Context) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
@@ -62,7 +59,7 @@ class MainViewModel: ViewModel() {
     fun logout(context: Context, navController: NavHostController) {
         viewModelScope.launch {
             TokenPreference.logout(context)
-            navController.navigate(Screen.LoginScreen.route) {
+            navController.navigate(Screen.LoadingScreen.route) {
                 popUpTo(Screen.MainScreen.route) {
                     inclusive = true
                 }

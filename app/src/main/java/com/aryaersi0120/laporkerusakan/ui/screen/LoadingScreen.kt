@@ -21,7 +21,7 @@ fun LoadingScreen(navController: NavHostController) {
     val token by TokenPreference.getToken(context).collectAsState(initial = null)
 
     LaunchedEffect(token) {
-        delay(1500)
+        delay(500)
         if (token.isNullOrEmpty()) {
             navController.navigate(Screen.LoginScreen.route) {
                 popUpTo(Screen.LoadingScreen.route)

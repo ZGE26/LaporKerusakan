@@ -25,9 +25,8 @@ android {
             project.rootProject.file("local.properties").inputStream()
         )
         buildConfigField(
-            "String", "API_KEY", properties.getProperty("API_KEY")
+            "String", "API_KEY",properties.getProperty("API_KEY")
         )
-
     }
 
     buildTypes {
@@ -69,6 +68,9 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.converter.scalars)
     implementation(libs.androidx.datastore.preferences)
+    implementation(libs.androidx.credentials)
+    implementation(libs.androidx.credentials.play.services.auth)
+    implementation(libs.googleid)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
