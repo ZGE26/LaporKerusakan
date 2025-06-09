@@ -13,26 +13,16 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -44,11 +34,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardCapitalization
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.credentials.CredentialManager
@@ -56,18 +41,22 @@ import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
 import androidx.credentials.GetCredentialResponse
 import androidx.credentials.exceptions.GetCredentialException
+import androidx.datastore.dataStore
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.aryaersi0120.laporkerusakan.BuildConfig
 import com.aryaersi0120.laporkerusakan.R
+import com.aryaersi0120.laporkerusakan.model.User
 import com.aryaersi0120.laporkerusakan.navigation.Screen
+import com.aryaersi0120.laporkerusakan.network.UserDataStore
 import com.aryaersi0120.laporkerusakan.ui.theme.LaporKerusakanTheme
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @Composable
 fun LoginScreen(navController: NavHostController) {
@@ -95,31 +84,11 @@ fun LoginScreen(navController: NavHostController) {
 
 @Composable
 fun LoginContent(modifier: Modifier, navController: NavHostController) {
-    val viewModel: MainViewModel = viewModel()
-
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var errorMassage by remember { mutableStateOf("") }
-
-    val isEmailValid = email.contains("@") && email.contains(".")
-
-    var passwordVisible by remember { mutableStateOf(false) }
-    var showDialogError by remember { mutableStateOf(false) }
-
     val context = LocalContext.current
 
-    val visibilityOn = painterResource(R.drawable.visibility)
-    val visibilityOff = painterResource(R.drawable.visibility_off_24)
-
-    if (viewModel.loginSuccess) {
-        LaunchedEffect(Unit) {
-            navController.navigate(Screen.LoadingScreen.route) {
-                popUpTo(Screen.LoginScreen.route) {
-                    inclusive = true
-                }
-            }
-        }
-    }
+    var errorMassage by remember { mutableStateOf("") }
+    var showDialogError by remember { mutableStateOf(false) }
+    val dataStore = UserDataStore(context)
 
     Column(
         modifier = modifier
@@ -128,155 +97,11 @@ fun LoginContent(modifier: Modifier, navController: NavHostController) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(
-            text = stringResource(R.string.app_name),
-            style = MaterialTheme.typography.headlineMedium,
-            modifier = Modifier.padding(bottom = 32.dp)
-        )
-
-        OutlinedTextField(
-            value = email,
-            onValueChange = { email = it },
-            label = { Text(stringResource(R.string.email)) },
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Default.Email,
-                    contentDescription = stringResource(R.string.email_icon)
-                )
-            },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
-            keyboardOptions = KeyboardOptions(
-                capitalization = KeyboardCapitalization.None,
-                keyboardType = KeyboardType.Email,
-                imeAction = ImeAction.Next
-            ),
-            isError = !isEmailValid && email.isNotEmpty(),
-            trailingIcon = {
-                Text(
-                    text = stringResource(R.string.format_email),
-                    modifier = Modifier.padding(end = 8.dp),
-                    style = MaterialTheme.typography.bodyMedium.copy(
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    ),
-                )
-            },
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        OutlinedTextField(
-            value = password,
-            onValueChange = { password = it },
-            label = { Text(stringResource(R.string.password)) },
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Default.Lock,
-                    contentDescription = stringResource(R.string.password_icon)
-                )
-            },
-            visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
-            keyboardOptions = KeyboardOptions(
-                capitalization = KeyboardCapitalization.Words,
-                imeAction = ImeAction.Done
-            ),
-            trailingIcon = {
-                val image = if (passwordVisible) visibilityOn else visibilityOff
-                val description = if (passwordVisible) "Hide password" else "Show password"
-
-                IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                    Icon(
-                        painter = image,
-                        contentDescription = description
-                    )
-                }
-            }
-        )
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Button(
-            onClick = {
-                if (email.isEmpty() || password.isEmpty()) {
-                    showDialogError = true
-                    errorMassage = "Email dan Password tidak boleh kosong"
-                } else {
-                    Log.d("LoginScreen", "Login clicked with Email: $email and Password: $password")
-//                    navController.navigate(Screen.MainScreen.route)
-                    viewModel.loginDummy(
-                        email = email,
-                        password = password,
-                        context = context
-                    )
-                }
-            },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(
-                text = "Login",
-                style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.Bold
-            )
-        }
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
-        ) {
-            Text(
-                text = stringResource(R.string.belum_punya_akun),
-                style = MaterialTheme.typography.bodyMedium,
-            )
-            TextButton(
-                onClick = {
-                    navController.navigate(Screen.RegisterScreen.route)
-                }
-            ) {
-                Text(
-                    text = stringResource(R.string.daftar),
-                    style = MaterialTheme.typography.bodyMedium.copy(
-                        color = MaterialTheme.colorScheme.primary
-                    ),
-                    fontWeight = FontWeight.Bold
-                )
-            }
-        }
-
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
-        ) {
-            HorizontalDivider(
-                modifier = Modifier.weight(1f),
-                thickness = 1.dp,
-                color = Color.Gray
-            )
-            Text(
-                text = "Atau",
-                modifier = Modifier.padding(horizontal = 8.dp),
-                style = MaterialTheme.typography.bodyMedium,
-                color = Color.Gray
-            )
-
-            HorizontalDivider(
-                modifier = Modifier.weight(1f),
-                thickness = 1.dp,
-                color = Color.Gray
-            )
-        }
-
-        Spacer(
-            modifier = Modifier.height(16.dp)
-        )
 
         Button(
             onClick = {
                 CoroutineScope(Dispatchers.IO).launch {
-                    signIn(context)
+                    signIn(context, navController,dataStore)
                 }
             },
             modifier = Modifier
@@ -316,7 +141,11 @@ fun LoginContent(modifier: Modifier, navController: NavHostController) {
     }
 }
 
-private suspend fun signIn(context: Context) {
+private suspend fun signIn(
+    context: Context,
+    navController: NavHostController,
+    dataStore: UserDataStore
+) {
     val googleIdOption: GetGoogleIdOption = GetGoogleIdOption.Builder()
         .setFilterByAuthorizedAccounts(false)
         .setServerClientId(BuildConfig.API_KEY)
@@ -329,19 +158,34 @@ private suspend fun signIn(context: Context) {
     try {
         val credentialManager = CredentialManager.create(context)
         val result = credentialManager.getCredential(context, request)
-        handleSignIn(result)
+
+        withContext(Dispatchers.Main) {
+            handleSignIn(result, navController, dataStore)
+        }
     } catch (e: GetCredentialException) {
         Log.e("SIGN-IN", "Error: ${e.errorMessage}")
     }
 }
 
-private fun handleSignIn(result: GetCredentialResponse) {
+private suspend fun handleSignIn(
+    result: GetCredentialResponse,
+    navController: NavHostController,
+    dataStore: UserDataStore
+    ) {
     val credential = result.credential
     if (credential is CustomCredential &&
         credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
         try {
             val googleId = GoogleIdTokenCredential.createFrom(credential.data)
-            Log.d("SIGN-IN", "User email: ${googleId.id}")
+            val nama = googleId.displayName ?: ""
+            val email = googleId.id
+            val photoUrl = googleId.profilePictureUri.toString()
+            dataStore.savaData(User(nama, email, photoUrl))
+
+            navController.navigate(Screen.LoadingScreen.route) {
+                popUpTo(Screen.LoginScreen.route) { inclusive = true }
+            }
+
         } catch (e: GetCredentialException) {
             Log.e("SIGN-IN", "Error : ${e.errorMessage}")
         }
@@ -349,6 +193,7 @@ private fun handleSignIn(result: GetCredentialResponse) {
         Log.e("SIGN-IN", "Error: unrecognized credential type")
     }
 }
+
 
 @Preview(showBackground = true)
 @Preview(uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES, showBackground = true)

@@ -11,20 +11,23 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
+import com.aryaersi0120.laporkerusakan.model.User
 import com.aryaersi0120.laporkerusakan.navigation.Screen
-import com.aryaersi0120.laporkerusakan.network.TokenPreference
+import com.aryaersi0120.laporkerusakan.network.UserDataStore
 import kotlinx.coroutines.delay
 
 @Composable
 fun LoadingScreen(navController: NavHostController) {
     val context = LocalContext.current
-    val token by TokenPreference.getToken(context).collectAsState(initial = null)
+    val userDataStore = UserDataStore(context)
 
-    LaunchedEffect(token) {
+    val user by userDataStore.userFlow.collectAsState(initial = User("", "", ""))
+
+    LaunchedEffect(user.email) {
         delay(500)
-        if (token.isNullOrEmpty()) {
+        if (user.email.isEmpty()) {
             navController.navigate(Screen.LoginScreen.route) {
-                popUpTo(Screen.LoadingScreen.route)
+                popUpTo(Screen.LoadingScreen.route) { inclusive = true }
             }
         } else {
             navController.navigate(Screen.MainScreen.route) {

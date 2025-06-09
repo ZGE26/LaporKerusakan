@@ -1,7 +1,6 @@
 package com.aryaersi0120.laporkerusakan.ui.screen
 
 import android.app.Activity
-import android.content.Context
 import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.padding
@@ -32,18 +31,32 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.aryaersi0120.laporkerusakan.R
-import com.aryaersi0120.laporkerusakan.network.TokenPreference
+import com.aryaersi0120.laporkerusakan.model.User
+import com.aryaersi0120.laporkerusakan.navigation.Screen
+import com.aryaersi0120.laporkerusakan.network.UserDataStore
 import com.aryaersi0120.laporkerusakan.ui.theme.LaporKerusakanTheme
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(navController: NavHostController) {
-
     val context = LocalContext.current
     val viewModel: MainViewModel = viewModel()
+    val activity = context as? Activity
+
+    val dataStore = UserDataStore(context)
     var showConfirDialog by remember { mutableStateOf(false) }
-    val activity = LocalContext.current as? Activity
+    val user by dataStore.userFlow.collectAsState(User())
+    val logoutSuccess by viewModel.logoutSuccess.collectAsState()
+
+    LaunchedEffect(logoutSuccess) {
+        if (logoutSuccess) {
+            viewModel.resetLogoutState()
+            navController.navigate(Screen.LoadingScreen.route) {
+                popUpTo(Screen.MainScreen.route) { inclusive = true }
+            }
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -57,13 +70,13 @@ fun MainScreen(navController: NavHostController) {
                 ),
                 actions = {
                     Menu {
-                        viewModel.logout(context, navController)
+                        viewModel.logout(context) // hanya hapus data
                     }
                 }
             )
         },
     ) { innerPadding ->
-        ScreenContent(modifier = Modifier.padding(innerPadding), context)
+        ScreenContent(modifier = Modifier.padding(innerPadding), user)
 
         BackHandler {
             showConfirDialog = true
@@ -78,22 +91,22 @@ fun MainScreen(navController: NavHostController) {
                 },
                 onDismiss = { showConfirDialog = false }
             )
-
     }
 }
 
+
 @Composable
-fun ScreenContent(modifier: Modifier, context: Context) {
-    val token by TokenPreference.getToken(context).collectAsState(initial = null)
+fun ScreenContent(modifier: Modifier, user: User) {
 
-    LaunchedEffect(token) {
-        if (!token.isNullOrEmpty()) {
-            Log.d("Token", "Logged in with token: $token")
-
+    LaunchedEffect(user.email) {
+        if (user.email.isNotEmpty()) {
+            Log.d("UserData", "Logged in as: ${user.email}")
+        } else {
+            Log.d("UserData", "No user logged in.")
         }
     }
 
-    Text("Testing Aplikasi Kerusakan", modifier)
+    Text("Halo, ${user.name}", modifier = modifier)
 }
 
 @Composable
