@@ -1,9 +1,17 @@
 package com.aryaersi0120.laporkerusakan.ui.screen
 
 import android.app.Activity
+import android.content.res.Configuration
 import android.util.Log
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.DropdownMenu
@@ -33,15 +41,21 @@ import androidx.navigation.compose.rememberNavController
 import com.aryaersi0120.laporkerusakan.R
 import com.aryaersi0120.laporkerusakan.model.User
 import com.aryaersi0120.laporkerusakan.navigation.Screen
+import com.aryaersi0120.laporkerusakan.network.ApiStatus
 import com.aryaersi0120.laporkerusakan.network.UserDataStore
 import com.aryaersi0120.laporkerusakan.ui.theme.LaporKerusakanTheme
+import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.ui.Alignment
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(navController: NavHostController) {
     val context = LocalContext.current
-    val viewModel: MainViewModel = viewModel()
+    val viewModel: KerusakanViewModel = viewModel()
     val activity = context as? Activity
 
     val dataStore = UserDataStore(context)
@@ -76,7 +90,7 @@ fun MainScreen(navController: NavHostController) {
             )
         },
     ) { innerPadding ->
-        ScreenContent(modifier = Modifier.padding(innerPadding), user)
+        ScreenContent(modifier = Modifier.padding(innerPadding), user, viewModel)
 
         BackHandler {
             showConfirDialog = true
@@ -96,7 +110,9 @@ fun MainScreen(navController: NavHostController) {
 
 
 @Composable
-fun ScreenContent(modifier: Modifier, user: User) {
+fun ScreenContent(modifier: Modifier, user: User, viewModel: KerusakanViewModel) {
+    val data by viewModel.kerusakanList
+    val status by viewModel.apiStatus
 
     LaunchedEffect(user.email) {
         if (user.email.isNotEmpty()) {
@@ -104,10 +120,63 @@ fun ScreenContent(modifier: Modifier, user: User) {
         } else {
             Log.d("UserData", "No user logged in.")
         }
+        viewModel.retrieveData(user.email)
     }
 
-    Text("Halo, ${user.name}", modifier = modifier)
+    when (status) {
+        ApiStatus.LOADING -> {
+            Box(
+                modifier = modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        }
+
+        ApiStatus.SUCCESS -> {
+            LazyVerticalGrid(
+                modifier = modifier
+                    .fillMaxSize()
+                    .padding(4.dp),
+                columns = GridCells.Fixed(1),
+            ) {
+                if (data.isNotEmpty()) {
+                    items(data) {
+                        CardLaporan(kerusakan = it)
+                    }
+                } else {
+                    item {
+                        Text(
+                            text = stringResource(R.string.no_data_available),
+                            style = MaterialTheme.typography.bodyLarge,
+                            modifier = Modifier.padding(16.dp)
+                        )
+                    }
+                }
+            }
+        }
+
+        ApiStatus.FAILED -> {
+            Column(
+                modifier = modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(stringResource(R.string.error))
+                Button(
+                    onClick = {
+                        viewModel.retrieveData(user.email)
+                    },
+                    modifier = Modifier.padding(top = 16.dp),
+                    contentPadding = PaddingValues(horizontal = 32.dp, vertical = 16.dp)
+                ) {
+                    Text(stringResource(R.string.try_again))
+                }
+            }
+        }
+    }
 }
+
 
 @Composable
 fun Menu(logout :() -> Unit) {
@@ -137,7 +206,7 @@ fun Menu(logout :() -> Unit) {
 }
 
 @Preview(showBackground = true)
-@Preview(uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES, showBackground = true)
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true)
 @Composable
 fun MainScreenPreview() {
     LaporKerusakanTheme {

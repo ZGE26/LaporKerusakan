@@ -12,4 +12,8 @@
     <string name="login_dengan_google">Login Dengan Google</string>
     <string name="menu">Menu</string>
     <string name="logout">Logout</string>
+    <string name="gambar">Gambar %1$s</string>
+    <string name="no_data_available">Laporan Tidak Ada</string>
+    <string name="try_again">Coba lagi</string>
+    <string name="error">Gagal memuat data… Koneksi Error</string>
 </resources>

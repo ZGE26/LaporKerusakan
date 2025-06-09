@@ -1,7 +1,5 @@
 package com.aryaersi0120.laporkerusakan.ui.screen
 
-import android.graphics.Bitmap
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,22 +18,22 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.aryaersi0120.laporkerusakan.R
+import com.aryaersi0120.laporkerusakan.model.Kerusakan
+import com.aryaersi0120.laporkerusakan.network.LaporApi
 import com.aryaersi0120.laporkerusakan.ui.theme.LaporKerusakanTheme
 
 @Composable
 fun CardLaporan(
-    bitmap: Bitmap?,
-    nama: String,
-    detail: String,
-    lokasi: String,
-    status: String
+    kerusakan: Kerusakan
 ) {
     Card(
         shape = RoundedCornerShape(16.dp),
@@ -56,40 +54,32 @@ fun CardLaporan(
                     .border(1.dp, Color.Gray, shape = RoundedCornerShape(12.dp))
                     .clip(RoundedCornerShape(12.dp))
             ) {
-                if (bitmap != null) {
-                    Image(
-                        bitmap = bitmap.asImageBitmap(),
-                        contentDescription = "Foto Barang",
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxSize()
-                    )
-                } else {
-                    Image(
-                        painter = painterResource(id = R.drawable.broken_image),
-                        contentDescription = "Gambar Tidak Tersedia",
-                        contentScale = ContentScale.Fit,
-                        modifier = Modifier.fillMaxSize()
-                    )
-                }
+
+                AsyncImage(
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(LaporApi.getKerusakanUrl(kerusakan.imagepath))
+                        .crossfade(true)
+                        .build(),
+                    contentDescription = "Foto Barang",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize(),
+                    error = painterResource(id = R.drawable.broken_image),
+                    placeholder = painterResource(id = R.drawable.broken_image)
+                )
             }
 
             Spacer(modifier = Modifier.height(12.dp))
 
             Text(
-                text = nama,
+                text = kerusakan.nama_barang,
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
             Spacer(modifier = Modifier.height(4.dp))
-            Text(text = detail, style = MaterialTheme.typography.bodyMedium)
+            Text(text = kerusakan.deskripsi_kerusakan, style = MaterialTheme.typography.bodyMedium)
             Spacer(modifier = Modifier.height(4.dp))
-            Text(text = "Lokasi: $lokasi", style = MaterialTheme.typography.bodySmall)
+            Text(text = "Lokasi: ${kerusakan.lokasi}", style = MaterialTheme.typography.bodySmall)
             Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = "Status: $status",
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.primary
-            )
         }
     }
 }
@@ -101,11 +91,15 @@ fun CardLaporan(
 fun CardLaporanPreview() {
     LaporKerusakanTheme {
         CardLaporan(
-            bitmap = null,
-            nama = "Kursi Kantor",
-            detail = "Kursi tidak bisa diputar",
-            lokasi = "Ruang Kerja Lantai 1",
-            status = "Dalam Proses"
+            kerusakan = Kerusakan(
+                id = 1,
+                imagepath = "path/to/image.jpg",
+                nama_barang = "Laptop",
+                deskripsi_kerusakan = "Layar retak",
+                lokasi = "Ruang Kelas",
+                upload_date = "2023-10-01",
+                imageUrl = null
+            )
         )
     }
 }
