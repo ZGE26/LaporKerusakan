@@ -11,7 +11,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
-import com.aryaersi0120.laporkerusakan.model.User
 import com.aryaersi0120.laporkerusakan.navigation.Screen
 import com.aryaersi0120.laporkerusakan.network.UserDataStore
 import kotlinx.coroutines.delay
@@ -20,18 +19,20 @@ import kotlinx.coroutines.delay
 fun LoadingScreen(navController: NavHostController) {
     val context = LocalContext.current
     val userDataStore = UserDataStore(context)
+    val user by userDataStore.userFlow.collectAsState(initial = null)
 
-    val user by userDataStore.userFlow.collectAsState(initial = User("", "", ""))
+    LaunchedEffect(user) {
+        if (user != null) {
+            delay(500)
 
-    LaunchedEffect(user.email) {
-        delay(500)
-        if (user.email.isEmpty()) {
-            navController.navigate(Screen.LoginScreen.route) {
-                popUpTo(Screen.LoadingScreen.route) { inclusive = true }
-            }
-        } else {
-            navController.navigate(Screen.MainScreen.route) {
-                popUpTo(Screen.LoadingScreen.route) { inclusive = true }
+            if (user?.email.isNullOrEmpty()) {
+                navController.navigate(Screen.LoginScreen.route) {
+                    popUpTo(Screen.LoadingScreen.route) { inclusive = true }
+                }
+            } else {
+                navController.navigate(Screen.MainScreen.route) {
+                    popUpTo(Screen.LoadingScreen.route) { inclusive = true }
+                }
             }
         }
     }
@@ -43,3 +44,4 @@ fun LoadingScreen(navController: NavHostController) {
         CircularProgressIndicator()
     }
 }
+

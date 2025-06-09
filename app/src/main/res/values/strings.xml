@@ -16,4 +16,11 @@
     <string name="no_data_available">Laporan Tidak Ada</string>
     <string name="try_again">Coba lagi</string>
     <string name="error">Gagal memuat data… Koneksi Error</string>
+    <string name="add_kerusakan">Tambah Data</string>
+    <string name="nama_barang">Nama Barang</string>
+    <string name="deskripsi_kerusakan">Deskripsi Kerusakan</string>
+    <string name="lokasi">Lokasi</string>
+    <string name="batal">Batal</string>
+    <string name="simpan">Simpan</string>
+    <string name="laporkan_kerusakan">Laporkan Kerusakan</string>
 </resources>

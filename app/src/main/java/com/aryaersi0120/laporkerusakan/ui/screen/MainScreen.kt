@@ -1,22 +1,32 @@
 package com.aryaersi0120.laporkerusakan.ui.screen
 
 import android.app.Activity
+import android.content.ContentResolver
 import android.content.res.Configuration
+import android.graphics.Bitmap
+import android.graphics.ImageDecoder
+import android.os.Build
+import android.provider.MediaStore
 import android.util.Log
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -31,10 +41,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
@@ -44,11 +56,10 @@ import com.aryaersi0120.laporkerusakan.navigation.Screen
 import com.aryaersi0120.laporkerusakan.network.ApiStatus
 import com.aryaersi0120.laporkerusakan.network.UserDataStore
 import com.aryaersi0120.laporkerusakan.ui.theme.LaporKerusakanTheme
-import androidx.compose.ui.unit.dp
-import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.ui.Alignment
+import com.canhub.cropper.CropImageContract
+import com.canhub.cropper.CropImageContractOptions
+import com.canhub.cropper.CropImageOptions
+import com.canhub.cropper.CropImageView
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -62,6 +73,13 @@ fun MainScreen(navController: NavHostController) {
     var showConfirDialog by remember { mutableStateOf(false) }
     val user by dataStore.userFlow.collectAsState(User())
     val logoutSuccess by viewModel.logoutSuccess.collectAsState()
+    var showKerusakan by remember { mutableStateOf(false) }
+
+    var bitmap: Bitmap? by remember { mutableStateOf(null) }
+    val laucher = rememberLauncherForActivityResult(CropImageContract()) {
+        bitmap = getCroppedImage(context.contentResolver, it)
+        if (bitmap != null) showKerusakan = true
+    }
 
     LaunchedEffect(logoutSuccess) {
         if (logoutSuccess) {
@@ -89,6 +107,23 @@ fun MainScreen(navController: NavHostController) {
                 }
             )
         },
+        floatingActionButton = {
+            FloatingActionButton(onClick = {
+                val options = CropImageContractOptions(
+                    null, CropImageOptions(
+                        imageSourceIncludeGallery = true,
+                        imageSourceIncludeCamera = true,
+                        fixAspectRatio = false
+                    )
+                )
+                laucher.launch(options)
+            }) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = stringResource(R.string.add_kerusakan),
+                )
+            }
+        }
     ) { innerPadding ->
         ScreenContent(modifier = Modifier.padding(innerPadding), user, viewModel)
 
@@ -96,7 +131,7 @@ fun MainScreen(navController: NavHostController) {
             showConfirDialog = true
         }
 
-        if (showConfirDialog)
+        if (showConfirDialog) {
             DialogKonfirmasi(
                 title = stringResource(R.string.keluar),
                 message = stringResource(R.string.pesan_keluar),
@@ -105,6 +140,17 @@ fun MainScreen(navController: NavHostController) {
                 },
                 onDismiss = { showConfirDialog = false }
             )
+        }
+
+        if (showKerusakan) {
+            KerusakanDialog(
+                bitmap = bitmap,
+                onDismiss = { showKerusakan = false },
+            ) { namaBarang, deskripsiKerusakan, lokasi ->
+                Log.d("Tambah", "Nama Barang: $namaBarang, Deskripsi: $deskripsiKerusakan, Lokasi: $lokasi")
+                showKerusakan = false
+            }
+        }
     }
 }
 
@@ -134,11 +180,11 @@ fun ScreenContent(modifier: Modifier, user: User, viewModel: KerusakanViewModel)
         }
 
         ApiStatus.SUCCESS -> {
-            LazyVerticalGrid(
+            LazyColumn(
                 modifier = modifier
                     .fillMaxSize()
                     .padding(4.dp),
-                columns = GridCells.Fixed(1),
+                contentPadding = PaddingValues(bottom = 80.dp)
             ) {
                 if (data.isNotEmpty()) {
                     items(data) {
@@ -174,6 +220,25 @@ fun ScreenContent(modifier: Modifier, user: User, viewModel: KerusakanViewModel)
                 }
             }
         }
+    }
+}
+
+private fun getCroppedImage(
+    resolver: ContentResolver,
+    result: CropImageView.CropResult
+): Bitmap? {
+    if (!result.isSuccessful) {
+        Log.e("IMAGE", "Rrror: ${result.error}")
+        return null
+    }
+
+    val uri = result.uriContent ?: return null
+
+    return if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
+        MediaStore.Images.Media.getBitmap(resolver, uri)
+    } else {
+        val source = ImageDecoder.createSource(resolver, uri)
+        ImageDecoder.decodeBitmap(source)
     }
 }
 
