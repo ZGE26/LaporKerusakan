@@ -39,6 +39,7 @@ interface KerusakanApiService {
         @Header("Authorization") userEmail: String,
         @Part("nama_barang") nama_barang: String,
         @Part("deskripsi_kerusakan") deskripsi_kerusakan : String,
+        @Part("lokasi") lokasi : String,
         @Part gambar : MultipartBody.Part?
     ) : GeneralApiResponse
 

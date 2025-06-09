@@ -15,6 +15,10 @@ import com.aryaersi0120.laporkerusakan.network.UserDataStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.MutableStateFlow
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.toRequestBody
+import java.io.ByteArrayOutputStream
 
 class KerusakanViewModel : ViewModel() {
 
@@ -29,10 +33,6 @@ class KerusakanViewModel : ViewModel() {
 
     var apiStatus = mutableStateOf(ApiStatus.LOADING)
     private set
-
-    fun clearMessage(){
-        errorMessage.value = null
-    }
 
     fun retrieveData(UserId : String){
         viewModelScope.launch(Dispatchers.IO) {
@@ -49,13 +49,39 @@ class KerusakanViewModel : ViewModel() {
     }
 
 
-    fun saveData(userId: String, nama: String, namaLatin: String, bitmap: Bitmap) {
+    fun saveData(userId: String,  bitmap: Bitmap, namaBarang: String, deskripsiKerusakan: String, lokasi: String) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
+                val imagePart = bitmap.toMultipartBody()
+                val response = LaporApi.service.uploadImage(
+                    userEmail = userId,
+                    nama_barang = namaBarang,
+                    deskripsi_kerusakan = deskripsiKerusakan,
+                    lokasi = lokasi,
+                    gambar = imagePart
+                )
+                if (response.status == "success") {
+                    Log.d("MainViewModel", "Data saved successfully")
+                    retrieveData(userId) // Refresh data after saving
+                } else {
+                    throw Exception(response.message)
+                }
             } catch (e: Exception) {
                 Log.d("MainViewModel", "Failure ${e.message}")
             }
         }
+    }
+
+    private fun Bitmap.toMultipartBody(): MultipartBody.Part {
+        val stream = ByteArrayOutputStream()
+        compress(Bitmap.CompressFormat.JPEG, 80, stream)
+        val byteArray = stream.toByteArray()
+        val requestBody = byteArray.toRequestBody(
+            "image/jpeg".toMediaTypeOrNull(), 0, byteArray.size
+        )
+        return MultipartBody.Part.createFormData(
+            "image", "image.jpg", requestBody
+        )
     }
 
     fun logout(context: Context) {
@@ -69,4 +95,7 @@ class KerusakanViewModel : ViewModel() {
         _logoutSuccess.value = false
     }
 
+    fun clearMessage() {
+        errorMessage.value = null
+    }
 }

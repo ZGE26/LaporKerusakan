@@ -8,6 +8,7 @@ import android.graphics.ImageDecoder
 import android.os.Build
 import android.provider.MediaStore
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.layout.Arrangement
@@ -67,6 +68,8 @@ import com.canhub.cropper.CropImageView
 fun MainScreen(navController: NavHostController) {
     val context = LocalContext.current
     val viewModel: KerusakanViewModel = viewModel()
+    val errorMessage by viewModel.errorMessage
+
     val activity = context as? Activity
 
     val dataStore = UserDataStore(context)
@@ -147,9 +150,14 @@ fun MainScreen(navController: NavHostController) {
                 bitmap = bitmap,
                 onDismiss = { showKerusakan = false },
             ) { namaBarang, deskripsiKerusakan, lokasi ->
-                Log.d("Tambah", "Nama Barang: $namaBarang, Deskripsi: $deskripsiKerusakan, Lokasi: $lokasi")
+                viewModel.saveData(user.email,bitmap!!, namaBarang, deskripsiKerusakan, lokasi)
                 showKerusakan = false
             }
+        }
+
+        if (errorMessage != null) {
+            Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
+            viewModel.clearMessage()
         }
     }
 }
