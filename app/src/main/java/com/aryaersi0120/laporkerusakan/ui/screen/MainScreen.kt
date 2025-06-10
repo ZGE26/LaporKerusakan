@@ -150,7 +150,7 @@ fun MainScreen(navController: NavHostController) {
                 bitmap = bitmap,
                 onDismiss = { showKerusakan = false },
             ) { namaBarang, deskripsiKerusakan, lokasi ->
-                viewModel.saveData(user.email,bitmap!!, namaBarang, deskripsiKerusakan, lokasi)
+                viewModel.saveData(user.email, namaBarang, deskripsiKerusakan, lokasi, bitmap!!)
                 showKerusakan = false
             }
         }

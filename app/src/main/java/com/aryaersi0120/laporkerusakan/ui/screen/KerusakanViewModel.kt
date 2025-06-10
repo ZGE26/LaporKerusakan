@@ -49,20 +49,25 @@ class KerusakanViewModel : ViewModel() {
     }
 
 
-    fun saveData(userId: String,  bitmap: Bitmap, namaBarang: String, deskripsiKerusakan: String, lokasi: String) {
+    fun saveData(userId: String, namaBarang: String, deskripsiKerusakan: String, lokasi: String, bitmap: Bitmap) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
+                val namaBarangBody = namaBarang.toRequestBody("text/plain".toMediaTypeOrNull())
+                val deskripsiBody = deskripsiKerusakan.toRequestBody("text/plain".toMediaTypeOrNull())
+                val lokasiBody = lokasi.toRequestBody("text/plain".toMediaTypeOrNull())
                 val imagePart = bitmap.toMultipartBody()
+
                 val response = LaporApi.service.uploadImage(
                     userEmail = userId,
-                    nama_barang = namaBarang,
-                    deskripsi_kerusakan = deskripsiKerusakan,
-                    lokasi = lokasi,
+                    nama_barang = namaBarangBody,
+                    deskripsi_kerusakan = deskripsiBody,
+                    lokasi = lokasiBody,
                     gambar = imagePart
                 )
+
                 if (response.status == "success") {
                     Log.d("MainViewModel", "Data saved successfully")
-                    retrieveData(userId) // Refresh data after saving
+                    retrieveData(userId)
                 } else {
                     throw Exception(response.message)
                 }
@@ -72,6 +77,7 @@ class KerusakanViewModel : ViewModel() {
         }
     }
 
+
     private fun Bitmap.toMultipartBody(): MultipartBody.Part {
         val stream = ByteArrayOutputStream()
         compress(Bitmap.CompressFormat.JPEG, 80, stream)
@@ -80,7 +86,7 @@ class KerusakanViewModel : ViewModel() {
             "image/jpeg".toMediaTypeOrNull(), 0, byteArray.size
         )
         return MultipartBody.Part.createFormData(
-            "image", "image.jpg", requestBody
+            "gambar", "image.jpg", requestBody
         )
     }
 

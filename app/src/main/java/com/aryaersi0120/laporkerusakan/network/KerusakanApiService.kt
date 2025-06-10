@@ -6,6 +6,7 @@ import com.aryaersi0120.laporkerusakan.model.ResponseKerusakan
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.http.DELETE
@@ -37,12 +38,11 @@ interface KerusakanApiService {
     @POST("api.php")
     suspend fun uploadImage(
         @Header("Authorization") userEmail: String,
-        @Part("nama_barang") nama_barang: String,
-        @Part("deskripsi_kerusakan") deskripsi_kerusakan : String,
-        @Part("lokasi") lokasi : String,
-        @Part gambar : MultipartBody.Part?
-    ) : GeneralApiResponse
-
+        @Part("nama_barang") nama_barang: RequestBody,
+        @Part("deskripsi_kerusakan") deskripsi_kerusakan: RequestBody,
+        @Part("lokasi") lokasi: RequestBody,
+        @Part gambar: MultipartBody.Part?
+    ): GeneralApiResponse
 
     @Multipart
     @POST("api.php")
