@@ -8,7 +8,6 @@ import androidx.navigation.compose.rememberNavController
 import com.aryaersi0120.laporkerusakan.ui.screen.LoadingScreen
 import com.aryaersi0120.laporkerusakan.ui.screen.LoginScreen
 import com.aryaersi0120.laporkerusakan.ui.screen.MainScreen
-import com.aryaersi0120.laporkerusakan.ui.screen.RegisterScreen
 
 @Composable
 fun SetupNavGraph(navController: NavHostController = rememberNavController()) {
@@ -26,9 +25,6 @@ fun SetupNavGraph(navController: NavHostController = rememberNavController()) {
         }
         composable(route = Screen.MainScreen.route) {
             MainScreen(navController)
-        }
-        composable(route = Screen.RegisterScreen.route) {
-            RegisterScreen(navController)
         }
     }
 }

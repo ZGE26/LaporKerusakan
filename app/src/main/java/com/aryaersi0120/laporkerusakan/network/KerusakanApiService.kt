@@ -1,7 +1,6 @@
 package com.aryaersi0120.laporkerusakan.network
 
 import com.aryaersi0120.laporkerusakan.model.GeneralApiResponse
-import com.aryaersi0120.laporkerusakan.model.Kerusakan
 import com.aryaersi0120.laporkerusakan.model.ResponseKerusakan
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -14,7 +13,6 @@ import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Multipart
 import retrofit2.http.POST
-import retrofit2.http.PUT
 import retrofit2.http.Part
 import retrofit2.http.Query
 

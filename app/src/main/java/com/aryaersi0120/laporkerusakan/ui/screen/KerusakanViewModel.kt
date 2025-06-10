@@ -32,11 +32,11 @@ class KerusakanViewModel : ViewModel() {
     var apiStatus = mutableStateOf(ApiStatus.LOADING)
     private set
 
-    fun retrieveData(UserId : String){
+    fun retrieveData(userId : String){
         viewModelScope.launch(Dispatchers.IO) {
             apiStatus.value = ApiStatus.LOADING
             try {
-                val response = LaporApi.service.getAllLapor(UserId)
+                val response = LaporApi.service.getAllLapor(userId)
                 kerusakanList.value = response.data
                 apiStatus.value = ApiStatus.SUCCESS
             } catch (e: Exception) {
@@ -98,6 +98,26 @@ class KerusakanViewModel : ViewModel() {
                 }
             } catch (e: Exception) {
                 Log.d("MainViewModel", "Failure ${e.message}")
+            }
+        }
+    }
+
+    fun deleteData(userId: String, id: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val result = LaporApi.service.deleteImage(
+                    userId,
+                    id
+                )
+                if (result.status == "success") {
+                    retrieveData(userId)
+                } else {
+                    throw Exception(result.message)
+                }
+            } catch (e: Exception) {
+                Log.d("MainViewModel", "Failure ${e.message}")
+            } finally {
+                retrieveData(userId)
             }
         }
     }

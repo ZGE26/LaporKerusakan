@@ -78,8 +78,8 @@ fun CardLaporan(
                     contentDescription = "Foto Barang",
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.fillMaxSize(),
+                    placeholder = painterResource(R.drawable.loading_img),
                     error = painterResource(id = R.drawable.broken_image),
-                    placeholder = painterResource(id = R.drawable.broken_image)
                 )
             }
 

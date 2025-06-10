@@ -165,21 +165,25 @@ fun MainScreen(navController: NavHostController) {
 
 
 @Composable
-fun ScreenContent(modifier: Modifier, user: User, viewModel: KerusakanViewModel) {
+fun ScreenContent(
+    modifier: Modifier = Modifier,
+    user: User,
+    viewModel: KerusakanViewModel
+) {
     val data by viewModel.kerusakanList
     val status by viewModel.apiStatus
-    var showDialogUpdate by remember { mutableStateOf(false) }
+
+    var showDialog by remember { mutableStateOf(false) }
+    var showEdit by remember { mutableStateOf(false) }
     var selectedItem by remember { mutableStateOf<Kerusakan?>(null) }
 
-    val context = LocalContext.current
-
-    LaunchedEffect(user.email) {
+    LaunchedEffect(key1 = user.email) {
         if (user.email.isNotEmpty()) {
             Log.d("UserData", "Logged in as: ${user.email}")
+            viewModel.retrieveData(user.email)
         } else {
             Log.d("UserData", "No user logged in.")
         }
-        viewModel.retrieveData(user.email)
     }
 
     when (status) {
@@ -205,9 +209,11 @@ fun ScreenContent(modifier: Modifier, user: User, viewModel: KerusakanViewModel)
                             kerusakan = item,
                             edit = {
                                 selectedItem = item
+                                showEdit = true
                             },
                             delete = {
-                                Toast.makeText(context, "Delete ${item.nama_barang}", Toast.LENGTH_SHORT).show()
+                                selectedItem = item
+                                showDialog = true
                             }
                         )
                     }
@@ -222,15 +228,36 @@ fun ScreenContent(modifier: Modifier, user: User, viewModel: KerusakanViewModel)
                 }
             }
 
-            selectedItem?.let { item ->
-                DialogUpdate(
-                    kerusakan = item,
+            if (showDialog && selectedItem != null) {
+                DialogKonfirmasi(
+                    title = "Hapus Laporan",
+                    message = "Apakah anda yakin menghapus laporan ini?",
                     onDismiss = {
+                        showDialog = false
+                        selectedItem = null
+                    },
+                    onConfirm = {
+                        selectedItem?.let {
+                            Log.d("Delete", "data ${it.id}")
+                            viewModel.deleteData(user.email, it.id)
+                        }
+                        showDialog = false
+                        selectedItem = null
+                    }
+                )
+            }
+
+            // Dialog update/edit data
+            if (showEdit && selectedItem != null) {
+                DialogUpdate(
+                    kerusakan = selectedItem!!,
+                    onDismiss = {
+                        showEdit = false
                         selectedItem = null
                     },
                     onConfirm = { nama, deskripsi, lokasi ->
-                        Log.d("UPDATE", "Data ${user.email}, ${item.id}, $nama, $deskripsi, $lokasi")
-                        viewModel.updateData(user.email, item.id, nama, deskripsi, lokasi)
+                        viewModel.updateData(user.email, selectedItem!!.id, nama, deskripsi, lokasi)
+                        showEdit = false
                         selectedItem = null
                     }
                 )
@@ -243,20 +270,19 @@ fun ScreenContent(modifier: Modifier, user: User, viewModel: KerusakanViewModel)
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(stringResource(R.string.error))
+                Text(text = stringResource(R.string.error))
                 Button(
-                    onClick = {
-                        viewModel.retrieveData(user.email)
-                    },
+                    onClick = { viewModel.retrieveData(user.email) },
                     modifier = Modifier.padding(top = 16.dp),
                     contentPadding = PaddingValues(horizontal = 32.dp, vertical = 16.dp)
                 ) {
-                    Text(stringResource(R.string.try_again))
+                    Text(text = stringResource(R.string.try_again))
                 }
             }
         }
     }
 }
+
 
 private fun getCroppedImage(
     resolver: ContentResolver,

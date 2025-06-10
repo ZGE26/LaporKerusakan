@@ -23,7 +23,7 @@ fun LoadingScreen(navController: NavHostController) {
 
     LaunchedEffect(user) {
         if (user != null) {
-            delay(500)
+            delay(800)
 
             if (user?.email.isNullOrEmpty()) {
                 navController.navigate(Screen.LoginScreen.route) {

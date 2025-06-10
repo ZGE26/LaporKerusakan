@@ -67,7 +67,7 @@ fun KerusakanDialog(
                         modifier = Modifier
                             .fillMaxWidth()
                             .aspectRatio(2f / 1.5f)
-                            .padding(bottom = 12.dp)
+                            .padding(bottom = 12.dp),
                     )
                 } else {
                     Image(

@@ -76,7 +76,7 @@ fun DialogUpdate(
                         .aspectRatio(2f / 1.5f)
                         .padding(bottom = 12.dp),
                     error = painterResource(id = R.drawable.broken_image),
-                    placeholder = painterResource(id = R.drawable.broken_image)
+                    placeholder = painterResource(id = R.drawable.loading_img)
                 )
 
                 OutlinedTextField(
