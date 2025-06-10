@@ -3,6 +3,7 @@ package com.aryaersi0120.laporkerusakan.ui.screen
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,8 +11,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,10 +35,20 @@ import com.aryaersi0120.laporkerusakan.R
 import com.aryaersi0120.laporkerusakan.model.Kerusakan
 import com.aryaersi0120.laporkerusakan.network.LaporApi
 import com.aryaersi0120.laporkerusakan.ui.theme.LaporKerusakanTheme
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.res.stringResource
 
 @Composable
 fun CardLaporan(
-    kerusakan: Kerusakan
+    kerusakan: Kerusakan,
+    edit: () -> Unit,
+    delete: () -> Unit
 ) {
     Card(
         shape = RoundedCornerShape(16.dp),
@@ -69,17 +84,61 @@ fun CardLaporan(
             }
 
             Spacer(modifier = Modifier.height(12.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                Column {
+                    Text(
+                        text = kerusakan.nama_barang,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(text = kerusakan.deskripsi_kerusakan, style = MaterialTheme.typography.bodyMedium)
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(text = "Lokasi: ${kerusakan.lokasi}", style = MaterialTheme.typography.bodySmall)
+                    Spacer(modifier = Modifier.height(4.dp))
+                }
+                MenuCard(
+                    edit = { edit() },
+                    delete = { delete() }
+                )
+            }
 
-            Text(
-                text = kerusakan.nama_barang,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
+        }
+    }
+}
+
+@Composable
+fun MenuCard(edit :() -> Unit, delete:() -> Unit) {
+    var expanded by remember { mutableStateOf(false) }
+
+    IconButton(onClick = { expanded = true }) {
+        Icon(
+            imageVector = Icons.Filled.MoreVert,
+            contentDescription = stringResource(R.string.menu),
+            tint = MaterialTheme.colorScheme.primary
+        )
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.edit)) },
+                onClick = {
+                    expanded = false
+                    edit()
+                }
             )
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(text = kerusakan.deskripsi_kerusakan, style = MaterialTheme.typography.bodyMedium)
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(text = "Lokasi: ${kerusakan.lokasi}", style = MaterialTheme.typography.bodySmall)
-            Spacer(modifier = Modifier.height(4.dp))
+
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.hapus)) },
+                onClick = {
+                    expanded = false
+                    delete()
+                }
+            )
         }
     }
 }
@@ -99,7 +158,9 @@ fun CardLaporanPreview() {
                 lokasi = "Ruang Kelas",
                 upload_date = "2023-10-01",
                 imageUrl = null
-            )
+            ),
+            delete = {},
+            edit = {}
         )
     }
 }

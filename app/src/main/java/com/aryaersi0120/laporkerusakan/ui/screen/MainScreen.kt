@@ -52,6 +52,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.aryaersi0120.laporkerusakan.R
+import com.aryaersi0120.laporkerusakan.model.Kerusakan
 import com.aryaersi0120.laporkerusakan.model.User
 import com.aryaersi0120.laporkerusakan.navigation.Screen
 import com.aryaersi0120.laporkerusakan.network.ApiStatus
@@ -167,6 +168,10 @@ fun MainScreen(navController: NavHostController) {
 fun ScreenContent(modifier: Modifier, user: User, viewModel: KerusakanViewModel) {
     val data by viewModel.kerusakanList
     val status by viewModel.apiStatus
+    var showDialogUpdate by remember { mutableStateOf(false) }
+    var selectedItem by remember { mutableStateOf<Kerusakan?>(null) }
+
+    val context = LocalContext.current
 
     LaunchedEffect(user.email) {
         if (user.email.isNotEmpty()) {
@@ -195,8 +200,16 @@ fun ScreenContent(modifier: Modifier, user: User, viewModel: KerusakanViewModel)
                 contentPadding = PaddingValues(bottom = 80.dp)
             ) {
                 if (data.isNotEmpty()) {
-                    items(data) {
-                        CardLaporan(kerusakan = it)
+                    items(data) { item ->
+                        CardLaporan(
+                            kerusakan = item,
+                            edit = {
+                                selectedItem = item
+                            },
+                            delete = {
+                                Toast.makeText(context, "Delete ${item.nama_barang}", Toast.LENGTH_SHORT).show()
+                            }
+                        )
                     }
                 } else {
                     item {
@@ -207,6 +220,20 @@ fun ScreenContent(modifier: Modifier, user: User, viewModel: KerusakanViewModel)
                         )
                     }
                 }
+            }
+
+            selectedItem?.let { item ->
+                DialogUpdate(
+                    kerusakan = item,
+                    onDismiss = {
+                        selectedItem = null
+                    },
+                    onConfirm = { nama, deskripsi, lokasi ->
+                        Log.d("UPDATE", "Data ${user.email}, ${item.id}, $nama, $deskripsi, $lokasi")
+                        viewModel.updateData(user.email, item.id, nama, deskripsi, lokasi)
+                        selectedItem = null
+                    }
+                )
             }
         }
 

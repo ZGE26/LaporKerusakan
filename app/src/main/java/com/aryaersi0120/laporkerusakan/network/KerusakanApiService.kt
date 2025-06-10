@@ -14,6 +14,7 @@ import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Multipart
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Part
 import retrofit2.http.Query
 
@@ -49,9 +50,9 @@ interface KerusakanApiService {
     suspend fun updateImage(
         @Header("Authorization") userEmail : String,
         @Query("id") imageId : Int,
-        @Part("nama_barang") nama_barang : String,
-        @Part("deskripsi_kerusakan") deskripsi_keruskan : String,
-        @Part gambar : MultipartBody.Part?
+        @Part("nama_barang") nama_barang : RequestBody,
+        @Part("deskripsi_kerusakan") deskripsi_keruskan : RequestBody,
+        @Part("lokasi") lokasi: RequestBody,
     ): GeneralApiResponse
 
     @DELETE("api.php")

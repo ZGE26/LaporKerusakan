@@ -6,15 +6,13 @@ import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.aryaersi0120.laporkerusakan.model.Kerusakan
 import com.aryaersi0120.laporkerusakan.network.ApiStatus
-import com.aryaersi0120.laporkerusakan.network.KerusakanApiService
 import com.aryaersi0120.laporkerusakan.network.LaporApi
 import com.aryaersi0120.laporkerusakan.network.UserDataStore
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -67,6 +65,33 @@ class KerusakanViewModel : ViewModel() {
 
                 if (response.status == "success") {
                     Log.d("MainViewModel", "Data saved successfully")
+                    retrieveData(userId)
+                } else {
+                    throw Exception(response.message)
+                }
+            } catch (e: Exception) {
+                Log.d("MainViewModel", "Failure ${e.message}")
+            }
+        }
+    }
+
+    fun updateData(userId: String, idLapor: Int, namaBarang: String, deskripsiKerusakan: String, lokasi: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val namaBarangBody = namaBarang.toRequestBody("text/plain".toMediaTypeOrNull())
+                val deskripsiBody = deskripsiKerusakan.toRequestBody("text/plain".toMediaTypeOrNull())
+                val lokasiBody = lokasi.toRequestBody("text/plain".toMediaTypeOrNull())
+
+                val response = LaporApi.service.updateImage(
+                    userEmail = userId,
+                    imageId = idLapor,
+                    nama_barang = namaBarangBody,
+                    deskripsi_keruskan = deskripsiBody,
+                    lokasi = lokasiBody
+                )
+
+                if (response.status == "success") {
+                    Log.d("MainViewModel", "Data updated successfully")
                     retrieveData(userId)
                 } else {
                     throw Exception(response.message)

@@ -12,6 +12,8 @@
     <string name="login_dengan_google">Login Dengan Google</string>
     <string name="menu">Menu</string>
     <string name="logout">Logout</string>
+    <string name="edit">Edit</string>
+    <string name="hapus">Hapus</string>
     <string name="gambar">Gambar %1$s</string>
     <string name="no_data_available">Laporan Tidak Ada</string>
     <string name="try_again">Coba lagi</string>
@@ -23,4 +25,5 @@
     <string name="batal">Batal</string>
     <string name="simpan">Simpan</string>
     <string name="laporkan_kerusakan">Laporkan Kerusakan</string>
+    <string name="perbarui_data">Update Lapor</string>
 </resources>
