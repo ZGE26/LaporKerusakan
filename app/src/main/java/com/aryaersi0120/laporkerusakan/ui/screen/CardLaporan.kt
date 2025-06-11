@@ -1,13 +1,11 @@
 package com.aryaersi0120.laporkerusakan.ui.screen
 
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -43,6 +41,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
+import androidx.compose.foundation.clickable
+import androidx.compose.ui.window.Dialog
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.window.DialogProperties
 
 @Composable
 fun CardLaporan(
@@ -50,26 +54,33 @@ fun CardLaporan(
     edit: () -> Unit,
     delete: () -> Unit
 ) {
+    var showImageDialog by remember { mutableStateOf(false) }
+    var imageUrlToDisplay by remember { mutableStateOf<String?>(null) }
+
     Card(
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(12.dp),
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp),
-        elevation = CardDefaults.cardElevation(8.dp)
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        elevation = CardDefaults.cardElevation(6.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(12.dp)
         ) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .aspectRatio(16f / 9f)
-                    .border(1.dp, Color.Gray, shape = RoundedCornerShape(12.dp))
-                    .clip(RoundedCornerShape(12.dp))
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(Color.LightGray)
+                    .clickable {
+                        imageUrlToDisplay = LaporApi.getKerusakanUrl(kerusakan.imagepath)
+                        showImageDialog = true
+                    }
             ) {
-
                 AsyncImage(
                     model = ImageRequest.Builder(LocalContext.current)
                         .data(LaporApi.getKerusakanUrl(kerusakan.imagepath))
@@ -88,24 +99,70 @@ fun CardLaporan(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
-                Column {
+                Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = kerusakan.nama_barang,
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                     Spacer(modifier = Modifier.height(4.dp))
-                    Text(text = kerusakan.deskripsi_kerusakan, style = MaterialTheme.typography.bodyMedium)
+                    Text(
+                        text = kerusakan.deskripsi_kerusakan,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Spacer(modifier = Modifier.height(6.dp))
+                    Text(
+                        text = "Lokasi: ${kerusakan.lokasi}",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.outline
+                    )
                     Spacer(modifier = Modifier.height(4.dp))
-                    Text(text = "Lokasi: ${kerusakan.lokasi}", style = MaterialTheme.typography.bodySmall)
-                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = "Diunggah pada: ${kerusakan.upload_date}",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.outline
+                    )
                 }
                 MenuCard(
                     edit = { edit() },
                     delete = { delete() }
                 )
             }
+        }
+    }
 
+    if (showImageDialog && imageUrlToDisplay != null) {
+        Dialog(
+            onDismissRequest = { showImageDialog = false },
+            properties = DialogProperties(
+                usePlatformDefaultWidth = false,
+                decorFitsSystemWindows = false
+            )
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.8f))
+                    .clickable { showImageDialog = false }
+            ) {
+                AsyncImage(
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(imageUrlToDisplay)
+                        .crossfade(true)
+                        .build(),
+                    contentDescription = "Full Image",
+                    contentScale = ContentScale.Fit,
+                    modifier = Modifier.fillMaxSize(),
+                    placeholder = painterResource(R.drawable.loading_img),
+                    error = painterResource(id = R.drawable.broken_image),
+                )
+            }
         }
     }
 }
@@ -118,14 +175,20 @@ fun MenuCard(edit :() -> Unit, delete:() -> Unit) {
         Icon(
             imageVector = Icons.Filled.MoreVert,
             contentDescription = stringResource(R.string.menu),
-            tint = MaterialTheme.colorScheme.primary
+            tint = Color.Black
         )
         DropdownMenu(
             expanded = expanded,
-            onDismissRequest = { expanded = false }
+            onDismissRequest = { expanded = false },
+            containerColor = Color.White
         ) {
             DropdownMenuItem(
-                text = { Text(stringResource(R.string.edit)) },
+                text = {
+                    Text(
+                        text = stringResource(R.string.edit),
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                },
                 onClick = {
                     expanded = false
                     edit()
@@ -133,7 +196,12 @@ fun MenuCard(edit :() -> Unit, delete:() -> Unit) {
             )
 
             DropdownMenuItem(
-                text = { Text(stringResource(R.string.hapus)) },
+                text = {
+                    Text(
+                        text = stringResource(R.string.hapus),
+                        color = MaterialTheme.colorScheme.error
+                    )
+                },
                 onClick = {
                     expanded = false
                     delete()
@@ -142,7 +210,6 @@ fun MenuCard(edit :() -> Unit, delete:() -> Unit) {
         }
     }
 }
-
 
 @Preview(showBackground = true)
 @Preview(uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES, showBackground = true)
@@ -153,9 +220,9 @@ fun CardLaporanPreview() {
             kerusakan = Kerusakan(
                 id = 1,
                 imagepath = "path/to/image.jpg",
-                nama_barang = "Laptop",
-                deskripsi_kerusakan = "Layar retak",
-                lokasi = "Ruang Kelas",
+                nama_barang = "Laptop Lenovo Ideapad 330S",
+                deskripsi_kerusakan = "Layar retak di bagian kiri bawah, kadang-kadang berkedip, keyboard ada beberapa tombol yang tidak berfungsi dengan baik.",
+                lokasi = "Ruang Kelas A101, Gedung Utama",
                 upload_date = "2023-10-01",
                 imageUrl = null
             ),

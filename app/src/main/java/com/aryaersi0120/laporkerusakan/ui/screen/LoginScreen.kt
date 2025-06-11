@@ -66,7 +66,7 @@ fun LoginScreen(navController: NavHostController) {
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
-        containerColor = MaterialTheme.colorScheme.background
+        containerColor = Color.White
     ) { innerPadding ->
         LoginContent(modifier = Modifier.padding(innerPadding), navController)
     }

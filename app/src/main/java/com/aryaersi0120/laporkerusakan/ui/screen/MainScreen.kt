@@ -45,6 +45,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -96,24 +97,30 @@ fun MainScreen(navController: NavHostController) {
     }
 
     Scaffold(
+        containerColor = Color.White,
         topBar = {
             TopAppBar(
                 title = {
                     Text(text = stringResource(id = R.string.app_name))
                 },
                 colors = TopAppBarDefaults.mediumTopAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.primary
+                    containerColor = Color.Black,
+                    titleContentColor = Color.White
                 ),
                 actions = {
-                    Menu {
-                        viewModel.logout(context) // hanya hapus data
-                    }
+                    Menu(
+                        logout = {
+                            viewModel.logout(context)
+                        },
+                        user
+                    )
                 }
             )
         },
         floatingActionButton = {
             FloatingActionButton(
+                containerColor = Color.Black,
+                contentColor = Color.White,
                 onClick = {
                 val options = CropImageContractOptions(
                     null, CropImageOptions(
@@ -309,18 +316,23 @@ private fun getCroppedImage(
 
 
 @Composable
-fun Menu(logout :() -> Unit) {
+fun Menu(
+    logout :() -> Unit,
+    user: User
+) {
     var expanded by remember { mutableStateOf(false) }
+    var showProfile by remember { mutableStateOf(false) }
 
     IconButton(onClick = { expanded = true }) {
         Icon(
             imageVector = Icons.Filled.MoreVert,
             contentDescription = stringResource(R.string.menu),
-            tint = MaterialTheme.colorScheme.primary
+            tint = Color.White
         )
         DropdownMenu(
             expanded = expanded,
-            onDismissRequest = { expanded = false }
+            onDismissRequest = { expanded = false },
+            containerColor = Color.White
         ) {
 
 
@@ -329,6 +341,21 @@ fun Menu(logout :() -> Unit) {
                 onClick = {
                     expanded = false
                     logout()
+                }
+            )
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.profile)) },
+                onClick = {
+                    expanded = false
+                    showProfile = true
+                }
+            )
+        }
+        if(showProfile) {
+            ProfilDialog(
+                user = user,
+                onDismissRequest = {
+                    showProfile = false
                 }
             )
         }

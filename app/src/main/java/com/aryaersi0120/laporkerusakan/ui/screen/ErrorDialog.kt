@@ -7,6 +7,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
@@ -23,12 +24,13 @@ fun ErrorDialog(
         properties = DialogProperties(
             dismissOnBackPress = true,
             dismissOnClickOutside = true
-        )
+        ),
     ) {
         Surface(
             shape = MaterialTheme.shapes.large,
             tonalElevation = 8.dp,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            color = Color.White
         ) {
             Column(
                 modifier = Modifier.padding(24.dp),

@@ -21,6 +21,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -53,7 +54,8 @@ fun DialogUpdate(
         Card(
             modifier = Modifier.padding(16.dp),
             shape = RoundedCornerShape(20.dp),
-            elevation = CardDefaults.cardElevation(8.dp)
+            elevation = CardDefaults.cardElevation(8.dp),
+            colors = CardDefaults.cardColors(containerColor = Color.White)
         ) {
             Column(modifier = Modifier.padding(20.dp)) {
 
@@ -136,7 +138,7 @@ fun DialogUpdate(
                             if (isValid) onConfirm(namaBarang, deskripsiKerusakan, lokasi)
                         },
                         enabled = isValid,
-                        shape = RoundedCornerShape(12.dp)
+                        shape = RoundedCornerShape(12.dp),
                     ) {
                         Text(stringResource(R.string.simpan))
                     }

@@ -2,6 +2,7 @@ package com.aryaersi0120.laporkerusakan.ui.screen
 
 import androidx.compose.runtime.Composable
 import androidx.compose.material3.*
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import com.aryaersi0120.laporkerusakan.ui.theme.LaporKerusakanTheme
 
@@ -17,12 +18,19 @@ fun DialogKonfirmasi(
         title = { Text(text = title) },
         text = { Text(text = message) },
         confirmButton = {
-            Button(onClick = onConfirm) {
+            Button(
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Black)
+                ,onClick = onConfirm
+            ) {
                 Text(text = "Ya")
             }
         },
+        containerColor = Color.White,
         dismissButton = {
-            Button(onClick = onDismiss) {
+            Button(
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
+                onClick = onDismiss
+            ) {
                 Text(text = "Tidak")
             }
         }
