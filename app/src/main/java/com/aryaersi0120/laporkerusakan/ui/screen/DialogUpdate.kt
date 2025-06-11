@@ -130,7 +130,10 @@ fun DialogUpdate(
                         onClick = onDismiss,
                         shape = RoundedCornerShape(12.dp)
                     ) {
-                        Text(stringResource(R.string.batal))
+                        Text(
+                            text = stringResource(R.string.batal),
+                            color = Color.Black
+                        )
                     }
 
                     OutlinedButton(
@@ -140,7 +143,10 @@ fun DialogUpdate(
                         enabled = isValid,
                         shape = RoundedCornerShape(12.dp),
                     ) {
-                        Text(stringResource(R.string.simpan))
+                        Text(
+                            text = stringResource(R.string.simpan),
+                            color = Color.Black
+                        )
                     }
                 }
             }

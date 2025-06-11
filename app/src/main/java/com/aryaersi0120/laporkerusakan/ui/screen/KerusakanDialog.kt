@@ -121,7 +121,6 @@ fun KerusakanDialog(
                         .padding(vertical = 6.dp)
                 )
 
-                // Tombol aksi
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -132,7 +131,10 @@ fun KerusakanDialog(
                         onClick = onDismiss,
                         shape = RoundedCornerShape(12.dp)
                     ) {
-                        Text(stringResource(R.string.batal))
+                        Text(
+                            text = stringResource(R.string.batal),
+                            color = Color.Black
+                        )
                     }
 
                     OutlinedButton(
@@ -143,7 +145,10 @@ fun KerusakanDialog(
                         },
                         shape = RoundedCornerShape(12.dp)
                     ) {
-                        Text(stringResource(R.string.simpan))
+                        Text(
+                            text = stringResource(R.string.simpan),
+                            color = Color.Black
+                        )
                     }
                 }
             }
